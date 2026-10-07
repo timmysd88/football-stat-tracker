@@ -1,30 +1,33 @@
-# ⚽ Football Stat Tracker
+# ⚡ Football Match Tracker
 
-A lightweight, mobile-first web application designed for touchline football (soccer) match tracking. Built for coaches and parents to easily record real-time player statistics and match impact without missing the action on the pitch.
+A lightweight, mobile-responsive web application designed for tracking live individual player performance during football matches—specifically optimized for wingers and attacking players. 
 
-## ✨ Key Features
+It provides real-time event logging, a dynamic performance rating algorithm, half-by-half comparative analytics, and CSV report exports.
 
-*   📱 **Mobile-Optimized Interface:** Features large, tap-friendly +/- buttons designed for quick, one-handed use while standing on the touchline.
-*   🔄 **Smart Position Switching:** The interface dynamically adapts based on the selected player. Outfield players show metrics like passing, tackles, and crossing, while Goalkeepers get a tailored interface for saves, distribution, and area command.
-*   💾 **Auto-Save & Persistent Storage:** Built using browser `localStorage`. If your phone screen locks, you accidentally close the tab, or the browser refreshes, zero data is lost. Your stats remain exactly where you left them.
-*   📊 **One-Tap CSV Export:** Instantly compile the entire team's match data into a neatly formatted `.csv` file. It downloads directly to your device and is pre-formatted to open perfectly in Excel, Google Sheets, or OpenOffice.
-*   👥 **Dynamic Roster Management:** Add players on the fly with their name, shirt number, and specific position. Switch between players instantly during the match.
+---
 
-## 🚀 How to Use (Live App)
+## ✨ Features
 
-Because this is a Single Page Application (SPA) built with vanilla HTML/JS, it runs directly in your web browser. 
+* **Real-Time Stat Tracking:** Quickly log key performance metrics with responsive touch controls:
+  * ⚡ **1v1 Dribbles / Take-Ons** (Successful Beat vs. Tackled/Dispossessed)
+  * 🎯 **Crosses & Cutbacks** (Completed Deliveries vs. Blocked/Incomplete)
+  * ⚽ **Shots & Finishing** (On Target/Goals vs. Off Target)
+  * 🔑 **Key Passes & Chance Creation**
+  * 🛡️ **Defensive Track Backs & Recoveries**
+* **Dynamic Performance Rating:** Live calculation of an overall match score out of 10.0 based on positive play, key chance creation, and turnover penalties.
+* **Match Timer Widget:** Built-in match stopwatch to monitor elapsed time during halves.
+* **Half-by-Half Breakdown:** Separate tracking views for 1st Half, 2nd Half, and a full Match Comparison Summary.
+* **Match Notes:** Dedicated text area for logging key tactical moments, halftime adjustments, or opponent notes.
+* **CSV Export:** Download full performance reports including half-by-half stats, ratings, and tactical notes for post-match analysis.
+* **Local Data Persistence:** Automatically saves active match data to `localStorage` so progress isn't lost if the browser refreshes.
 
-1. **Open the live tracker here:** `https://timmysd88.github.io/football-stat-tracker/` 
-2. **Add to Home Screen:** For the best experience, open the link in Safari (iOS) or Chrome (Android), open the browser menu, and select **"Add to Home Screen"**. This will install the tracker as a full-screen app icon on your phone.
-3. **Start Tracking:** Tap the top banner to build your matchday roster. Select a player to start tracking their stats.
-4. **Export:** At the full-time whistle, tap **Export** to download the team's spreadsheet. 
-5. **Reset:** Use the reset button in the player menu to wipe the slate clean for the next fixture.
+---
 
-## 🔒 Data Privacy
+## 🚀 Live Demo & Usage
 
-This application is 100% client-side. No data is sent to a server, database, or back to GitHub. All player names, numbers, and statistics are stored locally on the specific physical device running the app. 
+Since this is a single-file application built with pure HTML, CSS, and JavaScript, it runs directly in any modern web browser without needing a backend server or external dependencies.
 
-## 🛠️ Built With
-*   HTML5
-*   CSS3
-*   Vanilla JavaScript (ES5/ES6)
+### Accessing the Web App
+If enabled via **GitHub Pages**, you can open the app directly on your phone or desktop at:
+```text
+[https://timmysd88.github.io/football-stat-tracker/](https://timmysd88.github.io/football-stat-tracker/)

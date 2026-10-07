@@ -1,917 +1,997 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Player Stat Tracker</title>
-<style>
-    :root {
-        --bg-main: #f0f2f6;
-        --text-dark: #1a1c20;
-        --btn-gray: #9ba4b5;
-        --btn-blue: #3b71f7;
-        --btn-green: #2fa84b;
-        --btn-red: #d32f2f;
-        --bar-green: #d4edda;
-        --bar-blue: #d6e4ff;
-        --bar-cyan: #cbf5fc;
-        --bar-yellow: #fff3cd;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LW Match Tracker Pro</title>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --accent-green: #10b981;
+            --accent-green-hover: #059669;
+            --accent-red: #ef4444;
+            --accent-red-hover: #dc2626;
+            --accent-blue: #3b82f6;
+            --accent-gold: #f59e0b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
 
-    body {
-        margin: 0;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        background-color: var(--bg-main);
-        color: var(--text-dark);
-        padding-bottom: 20px;
-    }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-    /* Header */
-    .app-header {
-        background-color: #4b515d;
-        color: white;
-        padding: 15px 20px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        font-size: 18px;
-    }
-    .app-header .title {
-        font-weight: 500;
-    }
-    
-    .btn-export {
-        background-color: var(--btn-green);
-        color: white;
-        border: none;
-        padding: 8px 12px;
-        border-radius: 6px;
-        font-weight: bold;
-        font-size: 14px;
-        cursor: pointer;
-    }
-    .btn-export:active {
-        opacity: 0.8;
-    }
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            padding: 12px;
+            max-width: 600px;
+            margin: 0 auto;
+            padding-bottom: 40px;
+        }
 
-    /* Player Info Banner */
-    .player-info {
-        background: white;
-        text-align: center;
-        padding: 15px;
-        font-weight: bold;
-        font-size: 18px;
-        border-bottom: 1px solid #ddd;
-        cursor: pointer;
-        color: var(--btn-blue);
-    }
-    .player-info:active {
-        background: #f8f9fa;
-    }
-    .player-hint {
-        display: block;
-        font-size: 12px;
-        color: #666;
-        font-weight: normal;
-        margin-top: 4px;
-    }
+        /* App Header */
+        .header {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
 
-    /* Cards */
-    .card {
-        background: white;
-        border-radius: 12px;
-        margin: 10px;
-        padding: 15px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-    .card-title {
-        text-align: center;
-        font-weight: 700;
-        font-size: 18px;
-        margin-bottom: 15px;
-    }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
 
-    /* Stat Rows */
-    .row {
-        display: flex;
-        justify-content: space-around;
-        margin-bottom: 12px;
-    }
-    .stat-group {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 45%;
-    }
-    .stat-label {
-        font-size: 14px;
-        font-weight: 700;
-        margin-bottom: 5px;
-        text-align: center;
-    }
-    .stat-val-container {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    .stat-value {
-        font-size: 20px;
-        font-weight: bold;
-        width: 25px;
-        text-align: center;
-    }
+        .title-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-    /* Buttons */
-    .btn {
-        border: none;
-        border-radius: 8px;
-        width: 45px;
-        height: 32px;
-        color: white;
-        font-size: 20px;
-        font-weight: bold;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        user-select: none;
-        touch-action: manipulation;
-    }
-    .btn:active {
-        opacity: 0.8;
-    }
-    .btn-minus { background-color: var(--btn-gray); }
-    .btn-blue { background-color: var(--btn-blue); }
-    .btn-green { background-color: var(--btn-green); }
-    .btn-red { background-color: var(--btn-red); }
+        .badge {
+            background-color: var(--accent-green);
+            color: #000;
+            font-weight: 800;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
 
-    /* Progress Bars */
-    .progress-bar {
-        text-align: center;
-        padding: 6px;
-        border-radius: 6px;
-        font-weight: bold;
-        font-size: 14px;
-        margin-top: 5px;
-    }
-    .bg-green { background-color: var(--bar-green); color: #155724; }
-    .bg-blue { background-color: var(--bar-blue); color: #002d7a; }
-    .bg-cyan { background-color: var(--bar-cyan); color: #005c6e; }
-    .bg-yellow { background-color: var(--bar-yellow); color: #856404; }
+        .title-text h1 {
+            font-size: 18px;
+            font-weight: 700;
+            line-height: 1.1;
+        }
 
-    /* Modal Styles */
-    .modal {
-        display: none;
-        position: fixed;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.6);
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-    }
-    .modal-content {
-        background: white;
-        padding: 20px;
-        border-radius: 12px;
-        width: 85%;
-        max-width: 400px;
-        max-height: 80vh;
-        overflow-y: auto;
-    }
-    .modal-content h3 { margin-top: 0; text-align: center; }
-    
-    .player-list {
-        margin-bottom: 20px;
-        max-height: 150px;
-        overflow-y: auto;
-        border: 1px solid #eee;
-        border-radius: 8px;
-    }
-    .player-item {
-        padding: 12px;
-        border-bottom: 1px solid #eee;
-        cursor: pointer;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .player-item:last-child { border-bottom: none; }
-    .player-item:active { background-color: #f0f0f0; }
-    .player-item.active-player {
-        background-color: var(--bar-blue);
-        font-weight: bold;
-    }
+        .title-text span {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
 
-    .input-group {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        margin-bottom: 15px;
-    }
-    .input-group input, .input-group select {
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        font-size: 16px;
-        font-family: inherit;
-        background-color: white;
-    }
-    .btn-modal {
-        padding: 12px;
-        background: var(--btn-blue);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        width: 100%;
-        font-size: 16px;
-        font-weight: bold;
-        cursor: pointer;
-        margin-bottom: 10px;
-    }
-    .btn-close {
-        background: var(--btn-gray);
-    }
-    .btn-danger {
-        background: var(--btn-red);
-        margin-top: 20px;
-    }
-</style>
+        /* Timer & Live Rating Header Widget */
+        .header-widgets {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .rating-box {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid var(--accent-green);
+            padding: 4px 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .rating-label {
+            font-size: 8px;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+
+        .rating-value {
+            font-size: 16px;
+            font-weight: 900;
+            color: var(--accent-green);
+            line-height: 1;
+        }
+
+        .timer-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0,0,0,0.3);
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+        }
+
+        .timer-display {
+            font-family: monospace;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--accent-green);
+        }
+
+        .btn-timer {
+            background: var(--accent-green);
+            color: #000;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .btn-timer.running {
+            background: var(--accent-gold);
+        }
+
+        /* Match Info Form */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .input-group label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .input-group input {
+            background: #0f172a;
+            border: 1px solid var(--card-border);
+            color: #fff;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        /* Half Switcher Nav */
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            background: var(--card-bg);
+            padding: 6px;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px 0;
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            color: var(--text-muted);
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background-color: var(--accent-green);
+            color: #000;
+        }
+
+        /* Active Banner */
+        .status-banner {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: var(--accent-green);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Metric Cards */
+        .metric-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .metric-title {
+            font-size: 15px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .metric-stats {
+            text-align: right;
+        }
+
+        .pct-val {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--accent-green);
+        }
+
+        .count-val {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 14px 8px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            transition: transform 0.1s;
+        }
+
+        .action-btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn-success {
+            background-color: var(--accent-green);
+            color: #000;
+        }
+
+        .btn-fail {
+            background-color: var(--accent-red);
+            color: #fff;
+        }
+
+        .btn-neutral {
+            background-color: var(--accent-blue);
+            color: #fff;
+            grid-column: span 2;
+        }
+
+        .sub-text {
+            font-size: 10px;
+            opacity: 0.8;
+            font-weight: normal;
+        }
+
+        /* Summary View Styling */
+        .summary-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+
+        .summary-table th, .summary-table td {
+            padding: 8px 6px;
+            text-align: center;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .summary-table th {
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 10px;
+        }
+
+        .summary-table td:first-child {
+            text-align: left;
+            font-weight: 600;
+        }
+
+        /* Notes Box */
+        .notes-box {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+
+        .notes-box textarea {
+            width: 100%;
+            height: 60px;
+            background: #0f172a;
+            border: 1px solid var(--card-border);
+            border-radius: 6px;
+            color: #fff;
+            padding: 8px;
+            font-size: 12px;
+            resize: none;
+            margin-top: 6px;
+        }
+
+        /* Bottom Export Controls */
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-export {
+            flex: 2;
+            background: var(--accent-green);
+            color: #000;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .btn-reset {
+            flex: 1;
+            background: #334155;
+            color: #fff;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+        }
+    </style>
 </head>
-<body onload="updateUI()">
+<body>
 
-    <div class="app-header">
-        <span class="title">Stat Tracker</span>
-        <button class="btn-export" onclick="exportCSV()">Export</button>
-    </div>
-
-    <!-- CLICKABLE PLAYER SELECTION BANNER -->
-    <div class="player-info" onclick="openModal()">
-        <span id="activePlayerDisplay">👕 Tap here to add/select player</span>
-        <span class="player-hint" id="activePlayerHint">Currently viewing: No player selected</span>
-    </div>
-
-    <!-- ========================================== -->
-    <!-- OUTFIELD PLAYER UI                         -->
-    <!-- ========================================== -->
-    <div id="outfieldUI" style="display: none;">
-        <div class="card">
-            <div class="card-title">Player Summary</div>
-            <div class="row">
-                <div class="stat-group">
-                    <div class="stat-label">Minutes</div>
-                    <div class="stat-val-container">
-                        <button class="btn btn-minus" onclick="updateStat('mins', -1)">-</button>
-                        <div class="stat-value" id="mins">0</div>
-                        <button class="btn btn-blue" onclick="updateStat('mins', 1)">+</button>
-                    </div>
+    <!-- App Header -->
+    <div class="header">
+        <div class="top-bar">
+            <div class="title-area">
+                <div class="badge">LW</div>
+                <div class="title-text">
+                    <h1>Match Tracker</h1>
+                    <span>Left Winger Performance</span>
                 </div>
-                <div class="stat-group">
-                    <div class="stat-label">Goals</div>
-                    <div class="stat-val-container">
-                        <button class="btn btn-minus" onclick="updateStat('goals', -1)">-</button>
-                        <div class="stat-value" id="goals">0</div>
-                        <button class="btn btn-blue" onclick="updateStat('goals', 1)">+</button>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="stat-group">
-                    <div class="stat-label">Assists</div>
-                    <div class="stat-val-container">
-                        <button class="btn btn-minus" onclick="updateStat('assists', -1)">-</button>
-                        <div class="stat-value" id="assists">0</div>
-                        <button class="btn btn-blue" onclick="updateStat('assists', 1)">+</button>
-                    </div>
-                </div>
-                <div class="stat-group">
-                    <div class="stat-label">Dribbles (Succ)</div>
-                    <div class="stat-val-container">
-                        <button class="btn btn-minus" onclick="updateStat('dribbles', -1)">-</button>
-                        <div class="stat-value" id="dribbles">0</div>
-                        <button class="btn btn-blue" onclick="updateStat('dribbles', 1)">+</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-title">Passing Performance</div>
-            <div class="row">
-                <div class="stat-group">
-                    <div class="stat-label">Successful</div>
-                    <div class="stat-val-container">
-                        <button class="btn btn-minus" onclick="updateStatCalc('passSucc', -1)">-</button>
-                        <div class="stat-value" id="passSucc">0</div>
-                        <button class="btn btn-green" onclick="updateStatCalc('passSucc', 1)">+</button>
-                    </div>
-                </div>
-                <div class="stat-group">
-                    <div class="stat-label">Unsuccessful</div>
-                    <div class="stat-val-container">
-                        <button class="btn btn-minus" onclick="updateStatCalc('passFail', -1)">-</button>
-                        <div class="stat-value" id="passFail">0</div>
-                        <button class="btn btn-red" onclick="updateStatCalc('passFail', 1)">+</button>
-                    </div>
-                </div>
-            </div>
-            <div class="progress-bar bg-green" id="passBar">Completion: 0% (0/0)</div>
-        </div>
-
-        <div class="card">
-            <div class="card-title">Attacking Duels & Output</div>
-            <div class="row">
-                <div class="stat-group">
-                    <div class="stat-label">Shots on Target</div>
-                    <div class="stat-val-container">
-                        <button class="btn btn-minus" onclick="updateStatCalc('shotOn', -1)">-</button>
-                        <div class="stat-value" id="shotOn">0</div>
-                        <button class="btn btn-blue" onclick="updateStatCalc('shotOn', 1)">+</button>
-                    </div>
-                </div>
-                <div class="stat-group">
-                    <div class="stat-label">Shots Off Target</div>
-                    <div class="stat-val-container">
-                        <button class="btn btn-minus" onclick="updateStatCalc('shotOff', -1)">-</button>
-                        <div class="stat-value" id="shotOff">0</div>
-                        <button class="btn btn-blue" onclick="updateStatCalc('shotOff', 1)">+</button>
-                    </div>
-                </div>
-            </div>
-            <div class="progress-bar bg-blue" id="shotBar">Shot Accuracy: 0% (0/0)</div>
-
-            <div class="row" style="margin-top: 15px;">
-                <div class="stat-group">
-                    <div class="stat-label">Crosses (Succ)</div>
-                    <div class="stat-val-container">
-                        <button class="btn btn-minus" onclick="updateStatCalc('crossSucc', -1)">-</button>
-                        <div class="stat-value" id="crossSucc">0</div>
-                        <button class="btn btn-blue" onclick="updateStatCalc('crossSucc', 1)">+</button>
-                    </div>
-                </div>
-                <div class="stat-group">
-                    <div class="stat-label">Crosses (Failed)</div>
-                    <div class="stat-val-container">
-                        <button class="btn btn-minus" onclick="updateStatCalc('crossFail', -1)">-</button>
-                        <div class="stat-value" id="crossFail">0</div>
-                        <button class="btn btn-blue" onclick="updateStatCalc('crossFail', 1)">+</button>
-                    </div>
-                </div>
-            </div>
-            <div class="progress-bar bg-cyan" id="crossBar">Cross Completion: 0% (0/0)</div>
-        </div>
-
-        <div class="card">
-            <div class="card-title">Defending & Duels</div>
-            <div class="row">
-                <div class="stat-group">
-                    <div class="stat-label">Tackles Won</div>
-                    <div class="stat-val-container">
-                        <button class="btn btn-minus" onclick="updateStatCalc('tackWon', -1)">-</button>
-                        <div class="stat-value" id="tackWon">0</div>
-                        <button class="btn btn-blue" onclick="updateStatCalc('tackWon', 1)">+</button>
-                    </div>
-                </div>
-                <div class="stat-group">
-                    <div class="stat-label">Tackles Lost</div>
-                    <div class="stat-val-container">
-                        <button class="btn btn-minus" onclick="updateStatCalc('tackLost', -1)">-</button>
-                        <div class="stat-value" id="tackLost">0</div>
-                        <button class="btn btn-red" onclick="updateStatCalc('tackLost', 1)">+</button>
-                    </div>
-                </div>
-            </div>
-            <div class="progress-bar bg-yellow" id="tackleBar">Tackle Success: 0% (0/0)</div>
-
-            <div class="row" style="margin-top: 15px;">
-                <div class="stat-group">
-                    <div class="stat-label">Interceptions</div>
-                    <div class="stat-val-container">
-                        <button class="btn btn-minus" onclick="updateStat('intcpt', -1)">-</button>
-                        <div class="stat-value" id="intcpt">0</div>
-                        <button class="btn btn-blue" onclick="updateStat('intcpt', 1)">+</button>
-                    </div>
-                </div>
-                <div class="stat-group">
-                    <div class="stat-label">Dispossessed</div>
-                    <div class="stat-val-container">
-                        <button class="btn btn-minus" onclick="updateStat('disposs', -1)">-</button>
-                        <div class="stat-value" id="disposs">0</div>
-                        <button class="btn btn-blue" onclick="updateStat('disposs', 1)">+</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-title">Fouls & Discipline</div>
-            <div class="row">
-                <div class="stat-group">
-                    <div class="stat-label">Fouls Won</div>
-                    <div class="stat-val-container">
-                        <button class="btn btn-minus" onclick="updateStat('foulWon', -1)">-</button>
-                        <div class="stat-value" id="foulWon">0</div>
-                        <button class="btn btn-blue" onclick="updateStat('foulWon', 1)">+</button>
-                    </div>
-                </div>
-                <div class="stat-group">
-                    <div class="stat-label">Fouls Conceded</div>
-                    <div class="stat-val-container">
-                        <button class="btn btn-minus" onclick="updateStat('foulCon', -1)">-</button>
-                        <div class="stat-value" id="foulCon">0</div>
-                        <button class="btn btn-red" onclick="updateStat('foulCon', 1)">+</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ========================================== -->
-    <!-- GOALKEEPER UI                              -->
-    <!-- ========================================== -->
-    <div id="gkUI" style="display: none;">
-        <div class="card">
-            <div class="card-title">Shot Stopping</div>
-            <div class="row">
-                <div class="stat-group">
-                    <div class="stat-label">Minutes</div>
-                    <div class="stat-val-container">
-                        <button class="btn btn-minus" onclick="updateStat('mins', -1)">-</button>
-                        <div class="stat-value" id="gk_mins">0</div>
-                        <button class="btn btn-blue" onclick="updateStat('mins', 1)">+</button>
-                    </div>
-                </div>
-                <div class="stat-group">
-                    <div class="stat-label">Drops / Spills</div>
-                    <div class="stat-val-container">
-                        <button class="btn btn-minus" onclick="updateStat('spills', -1)">-</button>
-                        <div class="stat-value" id="spills">0</div>
-                        <button class="btn btn-red" onclick="updateStat('spills', 1)">+</button>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="stat-group">
-                    <div class="stat-label">Saves Made</div>
-                    <div class="stat-val-container">
-                        <button class="btn btn-minus" onclick="updateStatCalc('saves', -1)">-</button>
-                        <div class="stat-value" id="saves">0</div>
-                        <button class="btn btn-green" onclick="updateStatCalc('saves', 1)">+</button>
-                    </div>
-                </div>
-                <div class="stat-group">
-                    <div class="stat-label">Goals Conceded</div>
-                    <div class="stat-val-container">
-                        <button class="btn btn-minus" onclick="updateStatCalc('goalsConc', -1)">-</button>
-                        <div class="stat-value" id="goalsConc">0</div>
-                        <button class="btn btn-red" onclick="updateStatCalc('goalsConc', 1)">+</button>
-                    </div>
-                </div>
-            </div>
-            <div class="progress-bar bg-green" id="saveBar">Save Percentage: 0% (0/0)</div>
-        </div>
-
-        <div class="card">
-            <div class="card-title">Distribution</div>
-            <div class="row">
-                <div class="stat-group">
-                    <div class="stat-label">Kicks (Succ)</div>
-                    <div class="stat-val-container">
-                        <button class="btn btn-minus" onclick="updateStatCalc('kickSucc', -1)">-</button>
-                        <div class="stat-value" id="kickSucc">0</div>
-                        <button class="btn btn-blue" onclick="updateStatCalc('kickSucc', 1)">+</button>
-                    </div>
-                </div>
-                <div class="stat-group">
-                    <div class="stat-label">Kicks (Fail)</div>
-                    <div class="stat-val-container">
-                        <button class="btn btn-minus" onclick="updateStatCalc('kickFail', -1)">-</button>
-                        <div class="stat-value" id="kickFail">0</div>
-                        <button class="btn btn-blue" onclick="updateStatCalc('kickFail', 1)">+</button>
-                    </div>
-                </div>
-            </div>
-            <div class="progress-bar bg-blue" id="kickBar">Kicking Accuracy: 0% (0/0)</div>
-
-            <div class="row" style="margin-top: 15px;">
-                <div class="stat-group">
-                    <div class="stat-label">Throws (Succ)</div>
-                    <div class="stat-val-container">
-                        <button class="btn btn-minus" onclick="updateStatCalc('throwSucc', -1)">-</button>
-                        <div class="stat-value" id="throwSucc">0</div>
-                        <button class="btn btn-blue" onclick="updateStatCalc('throwSucc', 1)">+</button>
-                    </div>
-                </div>
-                <div class="stat-group">
-                    <div class="stat-label">Throws (Fail)</div>
-                    <div class="stat-val-container">
-                        <button class="btn btn-minus" onclick="updateStatCalc('throwFail', -1)">-</button>
-                        <div class="stat-value" id="throwFail">0</div>
-                        <button class="btn btn-blue" onclick="updateStatCalc('throwFail', 1)">+</button>
-                    </div>
-                </div>
-            </div>
-            <div class="progress-bar bg-cyan" id="throwBar">Throwing Accuracy: 0% (0/0)</div>
-        </div>
-
-        <div class="card">
-            <div class="card-title">Command of Area</div>
-            <div class="row">
-                <div class="stat-group">
-                    <div class="stat-label">Crosses Claimed</div>
-                    <div class="stat-val-container">
-                        <button class="btn btn-minus" onclick="updateStat('crossClaim', -1)">-</button>
-                        <div class="stat-value" id="crossClaim">0</div>
-                        <button class="btn btn-blue" onclick="updateStat('crossClaim', 1)">+</button>
-                    </div>
-                </div>
-                <div class="stat-group">
-                    <div class="stat-label">Punches</div>
-                    <div class="stat-val-container">
-                        <button class="btn btn-minus" onclick="updateStat('punch', -1)">-</button>
-                        <div class="stat-value" id="punch">0</div>
-                        <button class="btn btn-blue" onclick="updateStat('punch', 1)">+</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row" style="margin-top: 15px;">
-                <div class="stat-group">
-                    <div class="stat-label">Sweeper Actions</div>
-                    <div class="stat-val-container">
-                        <button class="btn btn-minus" onclick="updateStat('sweep', -1)">-</button>
-                        <div class="stat-value" id="sweep">0</div>
-                        <button class="btn btn-blue" onclick="updateStat('sweep', 1)">+</button>
-                    </div>
-                </div>
-                <div class="stat-group">
-                    <div class="stat-label">1v1s Won</div>
-                    <div class="stat-val-container">
-                        <button class="btn btn-minus" onclick="updateStat('oneVone', -1)">-</button>
-                        <div class="stat-value" id="oneVone">0</div>
-                        <button class="btn btn-blue" onclick="updateStat('oneVone', 1)">+</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-title">Penalties & Discipline</div>
-            <div class="row">
-                <div class="stat-group">
-                    <div class="stat-label">Pens Faced</div>
-                    <div class="stat-val-container">
-                        <button class="btn btn-minus" onclick="updateStat('pensFaced', -1)">-</button>
-                        <div class="stat-value" id="pensFaced">0</div>
-                        <button class="btn btn-blue" onclick="updateStat('pensFaced', 1)">+</button>
-                    </div>
-                </div>
-                <div class="stat-group">
-                    <div class="stat-label">Pens Saved</div>
-                    <div class="stat-val-container">
-                        <button class="btn btn-minus" onclick="updateStat('pensSaved', -1)">-</button>
-                        <div class="stat-value" id="pensSaved">0</div>
-                        <button class="btn btn-green" onclick="updateStat('pensSaved', 1)">+</button>
-                    </div>
-                </div>
-            </div>
-            <div class="row" style="margin-top: 15px;">
-                <div class="stat-group">
-                    <div class="stat-label">Fouls Won</div>
-                    <div class="stat-val-container">
-                        <button class="btn btn-minus" onclick="updateStat('foulWon', -1)">-</button>
-                        <div class="stat-value" id="gk_foulWon">0</div>
-                        <button class="btn btn-blue" onclick="updateStat('foulWon', 1)">+</button>
-                    </div>
-                </div>
-                <div class="stat-group">
-                    <div class="stat-label">Fouls Conceded</div>
-                    <div class="stat-val-container">
-                        <button class="btn btn-minus" onclick="updateStat('foulCon', -1)">-</button>
-                        <div class="stat-value" id="gk_foulCon">0</div>
-                        <button class="btn btn-red" onclick="updateStat('foulCon', 1)">+</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- MODAL FOR PLAYER ROSTER -->
-    <div id="playerModal" class="modal">
-        <div class="modal-content">
-            <h3>Team Roster</h3>
-            <div class="player-list" id="playerList">
-                <!-- Players injected here via JS -->
             </div>
             
-            <hr style="border: 0.5px solid #ddd; margin: 15px 0;">
-            
-            <h4 style="margin-top:0; text-align:center;">Add New Player</h4>
+            <div class="header-widgets">
+                <!-- Live Rating Widget -->
+                <div class="rating-box" id="ratingBox">
+                    <div class="rating-label" id="ratingLabel">1H RATING</div>
+                    <div class="rating-value" id="liveRating">6.0</div>
+                </div>
+
+                <!-- Timer Box -->
+                <div class="timer-box">
+                    <div class="timer-display" id="timer">00:00</div>
+                    <button class="btn-timer" id="timerBtn" onclick="toggleTimer()">Start</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-grid">
             <div class="input-group">
-                <input type="text" id="newName" placeholder="Player Name">
-                <input type="number" id="newNumber" placeholder="Shirt Number">
-                
-                <select id="newPos">
-                    <option value="" disabled selected>Select Position...</option>
-                    <option value="ST">Striker (ST)</option>
-                    <option value="LW">Left Wing (LW)</option>
-                    <option value="RW">Right Wing (RW)</option>
-                    <option value="CAM">Attacking Mid (CAM)</option>
-                    <option value="CM">Central Mid (CM)</option>
-                    <option value="CDM">Defensive Mid (CDM)</option>
-                    <option value="LB">Left Back (LB)</option>
-                    <option value="CB">Center Back (CB)</option>
-                    <option value="RB">Right Back (RB)</option>
-                    <option value="GK">Goalkeeper (GK)</option>
-                </select>
-                
+                <label>Player</label>
+                <input type="text" id="playerName" placeholder="e.g. Leo" onchange="saveData()">
             </div>
-            <button class="btn-modal" onclick="addPlayer()">Add Player to Team</button>
-            <button class="btn-modal btn-close" onclick="closeModal()">Close Window</button>
-            
-            <button class="btn-modal btn-danger" onclick="clearAllData()">Reset All Data for New Match</button>
+            <div class="input-group">
+                <label>Opponent</label>
+                <input type="text" id="opponent" placeholder="e.g. Rovers" onchange="saveData()">
+            </div>
+            <div class="input-group">
+                <label>Date</label>
+                <input type="date" id="matchDate" onchange="saveData()">
+            </div>
         </div>
     </div>
 
-<script>
-    // Unified State Management
-    var savedPlayers = localStorage.getItem('unifiedTrackerPlayers') || localStorage.getItem('matchTrackerPlayers');
-    var savedCurrentId = localStorage.getItem('unifiedTrackerCurrentId') || localStorage.getItem('matchTrackerCurrentId');
+    <!-- Half Switcher -->
+    <div class="nav-tabs">
+        <button class="tab-btn active" id="tab_h1" onclick="switchHalf('h1')">1st Half</button>
+        <button class="tab-btn" id="tab_h2" onclick="switchHalf('h2')">2nd Half</button>
+        <button class="tab-btn" id="tab_summary" onclick="switchHalf('summary')">Full Summary</button>
+    </div>
 
-    var players = savedPlayers ? JSON.parse(savedPlayers) : {};
-    var currentPlayerId = savedCurrentId ? savedCurrentId : null;
-    
-    // Master list of all possible stats for all positions
-    var allStatKeys = [
-        'mins', 'goals', 'assists', 'dribbles', 'passSucc', 'passFail', 'shotOn', 'shotOff', 'crossSucc', 'crossFail', 'tackWon', 'tackLost', 'intcpt', 'disposs', 'foulWon', 'foulCon',
-        'spills', 'saves', 'goalsConc', 'kickSucc', 'kickFail', 'throwSucc', 'throwFail', 'crossClaim', 'punch', 'sweep', 'oneVone', 'pensFaced', 'pensSaved'
-    ];
+    <!-- Active Mode Indicator -->
+    <div class="status-banner" id="statusBanner">
+        <span id="statusText">Editing 1st Half Statistics</span>
+        <button class="btn-timer" style="background:#38bdf8; color:#000;" onclick="switchHalf('h2')" id="quickSwitchBtn">Go to 2nd Half &rarr;</button>
+    </div>
 
-    // Function to save data to device memory
-    function saveData() {
-        localStorage.setItem('unifiedTrackerPlayers', JSON.stringify(players));
-        if (currentPlayerId) {
-            localStorage.setItem('unifiedTrackerCurrentId', currentPlayerId);
-        } else {
-            localStorage.removeItem('unifiedTrackerCurrentId');
-        }
-    }
+    <!-- Active Half Tracking Controls -->
+    <div id="trackingView">
 
-    // Function to clear all data
-    function clearAllData() {
-        if(confirm("Are you sure you want to delete all players and stats? This cannot be undone!")) {
-            players = {};
-            currentPlayerId = null;
-            saveData();
-            updateUI();
-            closeModal();
-            alert("All data cleared ready for the next match.");
-        }
-    }
+        <!-- 1. Dribbles -->
+        <div class="metric-card">
+            <div class="metric-header">
+                <div class="metric-title">⚡ 1v1 Dribbles / Take-Ons</div>
+                <div class="metric-stats">
+                    <div class="pct-val" id="dribble_pct">0%</div>
+                    <div class="count-val" id="dribble_cnt">0 / 0</div>
+                </div>
+            </div>
+            <div class="btn-grid">
+                <button class="action-btn btn-success" onclick="record('dribble', 'success')">
+                    Successful Beat
+                    <span class="sub-text">+1 Beat Defender</span>
+                </button>
+                <button class="action-btn btn-fail" onclick="record('dribble', 'fail')">
+                    Tackled / Lost
+                    <span class="sub-text">+1 Dispossessed</span>
+                </button>
+            </div>
+        </div>
 
-    // UI Update Logic
-    function updateUI() {
-        if (!currentPlayerId || !players[currentPlayerId]) {
-            document.getElementById('activePlayerDisplay').innerText = "👕 Tap here to add/select player";
-            document.getElementById('activePlayerHint').innerText = "Currently viewing: No player selected";
-            document.getElementById('outfieldUI').style.display = 'none';
-            document.getElementById('gkUI').style.display = 'none';
-            return;
-        }
+        <!-- 2. Crosses -->
+        <div class="metric-card">
+            <div class="metric-header">
+                <div class="metric-title">🎯 Crosses & Cutbacks</div>
+                <div class="metric-stats">
+                    <div class="pct-val" id="cross_pct">0%</div>
+                    <div class="count-val" id="cross_cnt">0 / 0</div>
+                </div>
+            </div>
+            <div class="btn-grid">
+                <button class="action-btn btn-success" onclick="record('cross', 'success')">
+                    Completed Box Delivery
+                    <span class="sub-text">+1 Found Teammate</span>
+                </button>
+                <button class="action-btn btn-fail" onclick="record('cross', 'fail')">
+                    Incomplete / Blocked
+                    <span class="sub-text">+1 Cut Out</span>
+                </button>
+            </div>
+        </div>
 
-        var p = players[currentPlayerId];
-        var isGK = (p.position === 'GK');
+        <!-- 3. Shooting -->
+        <div class="metric-card">
+            <div class="metric-header">
+                <div class="metric-title">⚽ Shots & Finish</div>
+                <div class="metric-stats">
+                    <div class="pct-val" id="shot_pct">0%</div>
+                    <div class="count-val" id="shot_cnt">0 / 0</div>
+                </div>
+            </div>
+            <div class="btn-grid">
+                <button class="action-btn btn-success" onclick="record('shot', 'success')">
+                    On Target / Goal
+                    <span class="sub-text">+1 Saved or Scored</span>
+                </button>
+                <button class="action-btn btn-fail" onclick="record('shot', 'fail')">
+                    Off Target
+                    <span class="sub-text">+1 Missed Frame</span>
+                </button>
+            </div>
+        </div>
 
-        document.getElementById('activePlayerDisplay').innerText = (isGK ? '🧤' : '👕') + ` #${p.number} ${p.name}`;
-        document.getElementById('activePlayerHint').innerText = `Position: ${p.position} (Tap to change)`;
+        <!-- 4. Key Passes -->
+        <div class="metric-card">
+            <div class="metric-header">
+                <div class="metric-title">🔑 Key Passes / Chances Set Up</div>
+                <div class="metric-stats">
+                    <div class="pct-val" id="keypass_cnt" style="color:#3b82f6;">0</div>
+                    <div class="count-val">Total Assists / Chance Created</div>
+                </div>
+            </div>
+            <div class="btn-grid">
+                <button class="action-btn btn-neutral" onclick="record('keypass', 'add')">
+                    +1 Key Pass (Led to Shot)
+                </button>
+            </div>
+        </div>
 
-        // Toggle which UI to show based on position
-        if (isGK) {
-            document.getElementById('outfieldUI').style.display = 'none';
-            document.getElementById('gkUI').style.display = 'block';
-        } else {
-            document.getElementById('outfieldUI').style.display = 'block';
-            document.getElementById('gkUI').style.display = 'none';
-        }
+        <!-- 5. Defensive Track Backs -->
+        <div class="metric-card">
+            <div class="metric-header">
+                <div class="metric-title">🛡️ Track Backs & Tackles</div>
+                <div class="metric-stats">
+                    <div class="pct-val" id="def_cnt" style="color:#3b82f6;">0</div>
+                    <div class="count-val">Total Recovery Actions</div>
+                </div>
+            </div>
+            <div class="btn-grid">
+                <button class="action-btn btn-neutral" onclick="record('def', 'add')">
+                    +1 Defensive Tackle / Recovery
+                </button>
+            </div>
+        </div>
 
-        // Update all stat numbers on screen
-        allStatKeys.forEach(function(key) {
-            if(document.getElementById(key)) document.getElementById(key).innerText = p.stats[key] || 0;
-            if(document.getElementById('gk_' + key)) document.getElementById('gk_' + key).innerText = p.stats[key] || 0;
-        });
+        <!-- Notes -->
+        <div class="notes-box">
+            <label style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Half Notes & Key Moments</label>
+            <textarea id="halfNotes" placeholder="e.g. Great beat on outside in 12 min. Needs to track right-back faster..." oninput="saveNotes()"></textarea>
+        </div>
 
-        updateBars(p.stats, isGK);
-    }
+    </div>
 
-    // Update Percentage Bars
-    function updateBars(stats, isGK) {
-        if(!stats) return;
+    <!-- Summary View (Hidden by default) -->
+    <div id="summaryView" style="display: none;">
+        <div class="summary-card">
+            <h3 style="font-size:15px; margin-bottom:8px;">Match Comparison Breakdown</h3>
+            <table class="summary-table">
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>1st Half</th>
+                        <th>2nd Half</th>
+                        <th>Overall Total</th>
+                    </tr>
+                </thead>
+                <tbody id="summaryTableBody">
+                    <!-- Populated dynamically -->
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-        if (isGK) {
-            var saveTotal = stats.saves + stats.goalsConc;
-            var savePerc = saveTotal === 0 ? 0 : Math.round((stats.saves / saveTotal) * 100);
-            document.getElementById('saveBar').innerText = `Save Percentage: ${savePerc}% (${stats.saves}/${saveTotal} Shots on Target)`;
+    <!-- Export & Reset Controls -->
+    <div class="controls">
+        <button class="btn-export" onclick="exportCSV()">📥 Export Match CSV</button>
+        <button class="btn-reset" onclick="resetAllData()">Reset Match</button>
+    </div>
 
-            var kickTotal = stats.kickSucc + stats.kickFail;
-            var kickPerc = kickTotal === 0 ? 0 : Math.round((stats.kickSucc / kickTotal) * 100);
-            document.getElementById('kickBar').innerText = `Kicking Accuracy: ${kickPerc}% (${stats.kickSucc}/${kickTotal})`;
+    <script>
+        // Global Data Structure
+        let activeHalf = 'h1';
+        let timerInterval = null;
+        let seconds = 0;
 
-            var throwTotal = stats.throwSucc + stats.throwFail;
-            var throwPerc = throwTotal === 0 ? 0 : Math.round((stats.throwSucc / throwTotal) * 100);
-            document.getElementById('throwBar').innerText = `Throwing Accuracy: ${throwPerc}% (${stats.throwSucc}/${throwTotal})`;
-        } else {
-            var passTotal = stats.passSucc + stats.passFail;
-            var passPerc = passTotal === 0 ? 0 : Math.round((stats.passSucc / passTotal) * 100);
-            document.getElementById('passBar').innerText = `Completion: ${passPerc}% (${stats.passSucc}/${passTotal})`;
-
-            var shotTotal = stats.shotOn + stats.shotOff;
-            var shotPerc = shotTotal === 0 ? 0 : Math.round((stats.shotOn / shotTotal) * 100);
-            document.getElementById('shotBar').innerText = `Shot Accuracy: ${shotPerc}% (${stats.shotOn}/${shotTotal})`;
-
-            var crossTotal = stats.crossSucc + stats.crossFail;
-            var crossPerc = crossTotal === 0 ? 0 : Math.round((stats.crossSucc / crossTotal) * 100);
-            document.getElementById('crossBar').innerText = `Cross Completion: ${crossPerc}% (${stats.crossSucc}/${crossTotal})`;
-
-            var tackTotal = stats.tackWon + stats.tackLost;
-            var tackPerc = tackTotal === 0 ? 0 : Math.round((stats.tackWon / tackTotal) * 100);
-            document.getElementById('tackleBar').innerText = `Tackle Success: ${tackPerc}% (${stats.tackWon}/${tackTotal})`;
-        }
-    }
-
-    // Stat Modification Logic
-    function updateStat(id, change) {
-        if (!currentPlayerId) {
-            alert("Please add and select a player from the menu first!");
-            openModal();
-            return;
-        }
-        
-        var currentVal = players[currentPlayerId].stats[id] || 0;
-        var newVal = currentVal + change;
-        if (newVal < 0) newVal = 0;
-        
-        players[currentPlayerId].stats[id] = newVal;
-        
-        // Update both UI elements if they share a name (like mins)
-        if(document.getElementById(id)) document.getElementById(id).innerText = newVal;
-        if(document.getElementById('gk_' + id)) document.getElementById('gk_' + id).innerText = newVal;
-        
-        saveData(); // Save to memory immediately
-    }
-
-    function updateStatCalc(id, change) {
-        if (!currentPlayerId) {
-            alert("Please add and select a player from the menu first!");
-            openModal();
-            return;
-        }
-        updateStat(id, change);
-        var isGK = (players[currentPlayerId].position === 'GK');
-        updateBars(players[currentPlayerId].stats, isGK);
-    }
-
-    // Modal & Roster Logic
-    function openModal() {
-        document.getElementById('playerModal').style.display = 'flex';
-        renderPlayerList();
-    }
-
-    function closeModal() {
-        document.getElementById('playerModal').style.display = 'none';
-    }
-
-    function renderPlayerList() {
-        var list = document.getElementById('playerList');
-        list.innerHTML = '';
-        
-        var count = 0;
-        for (var id in players) {
-            count++;
-            var p = players[id];
-            var div = document.createElement('div');
-            div.className = 'player-item';
-            if (id === currentPlayerId) div.classList.add('active-player');
-            
-            div.innerHTML = `<span><b>#${p.number} ${p.name}</b> - ${p.position}</span> <span>&#x276F;</span>`;
-            
-            (function(playerId) {
-                div.onclick = function() { selectPlayer(playerId); };
-            })(id);
-            
-            list.appendChild(div);
-        }
-
-        if(count === 0) {
-            list.innerHTML = '<div style="padding:10px; text-align:center; color:#666;">No players added yet.</div>';
-        }
-    }
-
-    function addPlayer() {
-        var name = document.getElementById('newName').value.trim();
-        var num = document.getElementById('newNumber').value.trim();
-        var pos = document.getElementById('newPos').value;
-
-        if(!name || !num || !pos) {
-            alert("Please enter a Player Name, Shirt Number, and select a Position.");
-            return;
-        }
-
-        var id = Date.now().toString();
-        
-        // Initialize player with 0s for all stats
-        var freshStats = {};
-        allStatKeys.forEach(function(key) { freshStats[key] = 0; });
-
-        players[id] = {
-            name: name, 
-            number: num, 
-            position: pos,
-            stats: freshStats
+        let stats = {
+            h1: {
+                dribble_s: 0, dribble_f: 0,
+                cross_s: 0, cross_f: 0,
+                shot_s: 0, shot_f: 0,
+                keypass: 0,
+                def: 0,
+                notes: ''
+            },
+            h2: {
+                dribble_s: 0, dribble_f: 0,
+                cross_s: 0, cross_f: 0,
+                shot_s: 0, shot_f: 0,
+                keypass: 0,
+                def: 0,
+                notes: ''
+            }
         };
 
-        // Clear inputs
-        document.getElementById('newName').value = '';
-        document.getElementById('newNumber').value = '';
-        document.getElementById('newPos').value = '';
+        // Initialize App
+        window.onload = function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('matchDate').value = today;
+            loadStoredData();
+            updateUI();
+        };
 
-        saveData(); // Save new player to memory
-        selectPlayer(id);
-    }
+        // Calculate Match Performance Rating out of 10.0
+        function calculateRating(s) {
+            let score = 6.0; // Baseline
 
-    function selectPlayer(id) {
-        currentPlayerId = id;
-        saveData();
-        updateUI();
-        closeModal();
-    }
+            // Positives
+            score += (s.dribble_s * 0.30);
+            score += (s.cross_s * 0.40);
+            score += (s.shot_s * 0.40);
+            score += (s.keypass * 0.50);
+            score += (s.def * 0.30);
 
-    // Unified Export to CSV Logic (Using Blob for robust spreadsheet formatting)
-    function exportCSV() {
-        if (Object.keys(players).length === 0) {
-            alert("No players have been added yet!");
-            return;
+            // Negatives (Turnovers)
+            score -= (s.dribble_f * 0.20);
+            score -= (s.cross_f * 0.15);
+            score -= (s.shot_f * 0.10);
+
+            // Clamp between 3.0 and 10.0
+            score = Math.max(3.0, Math.min(10.0, score));
+            return score.toFixed(1);
         }
 
-        // Headers arranged with Position, Name, and Number first
-        var headers = [
-            "Position", "Name", "Number", "Minutes", "Goals", "Assists", "Dribbles (Succ)",
-            "Passes (Succ)", "Passes (Fail)", "Shots on Target", "Shots off Target",
-            "Crosses (Succ)", "Crosses (Failed)", "Tackles Won", "Tackles Lost",
-            "Interceptions", "Dispossessed", "Fouls Won", "Fouls Conceded",
-            "GK Saves", "GK Goals Conceded", "GK Drops/Spills", "GK Kicks (Succ)",
-            "GK Kicks (Fail)", "GK Throws (Succ)", "GK Throws (Fail)", "GK Crosses Claimed",
-            "GK Punches", "GK Sweeper Actions", "GK 1v1s Won", "GK Pens Faced", "GK Pens Saved"
-        ];
+        // Switch active half view
+        function switchHalf(half) {
+            activeHalf = half;
 
-        var csvRows = [];
-        // Add headers to row data
-        csvRows.push('"' + headers.join('","') + '"');
+            // Reset tab styles
+            document.getElementById('tab_h1').classList.remove('active');
+            document.getElementById('tab_h2').classList.remove('active');
+            document.getElementById('tab_summary').classList.remove('active');
 
-        for (var id in players) {
-            var p = players[id];
-            var s = p.stats;
-            
-            var rowData = [
-                p.position, p.name, p.number,
-                s.mins || 0, s.goals || 0, s.assists || 0, s.dribbles || 0,
-                s.passSucc || 0, s.passFail || 0, s.shotOn || 0, s.shotOff || 0,
-                s.crossSucc || 0, s.crossFail || 0, s.tackWon || 0, s.tackLost || 0,
-                s.intcpt || 0, s.disposs || 0, s.foulWon || 0, s.foulCon || 0,
-                s.saves || 0, s.goalsConc || 0, s.spills || 0, s.kickSucc || 0,
-                s.kickFail || 0, s.throwSucc || 0, s.throwFail || 0, s.crossClaim || 0,
-                s.punch || 0, s.sweep || 0, s.oneVone || 0, s.pensFaced || 0, s.pensSaved || 0
+            const trackingView = document.getElementById('trackingView');
+            const summaryView = document.getElementById('summaryView');
+            const statusBanner = document.getElementById('statusBanner');
+
+            if (half === 'h1') {
+                document.getElementById('tab_h1').classList.add('active');
+                trackingView.style.display = 'block';
+                summaryView.style.display = 'none';
+                statusBanner.style.display = 'flex';
+                document.getElementById('statusText').innerText = "Editing 1st Half Statistics";
+                document.getElementById('quickSwitchBtn').style.display = "inline-block";
+                document.getElementById('quickSwitchBtn').innerText = "Go to 2nd Half →";
+                document.getElementById('quickSwitchBtn').onclick = () => switchHalf('h2');
+            } else if (half === 'h2') {
+                document.getElementById('tab_h2').classList.add('active');
+                trackingView.style.display = 'block';
+                summaryView.style.display = 'none';
+                statusBanner.style.display = 'flex';
+                document.getElementById('statusText').innerText = "Editing 2nd Half Statistics";
+                document.getElementById('quickSwitchBtn').style.display = "inline-block";
+                document.getElementById('quickSwitchBtn').innerText = "View Summary →";
+                document.getElementById('quickSwitchBtn').onclick = () => switchHalf('summary');
+            } else {
+                document.getElementById('tab_summary').classList.add('active');
+                trackingView.style.display = 'none';
+                summaryView.style.display = 'block';
+                statusBanner.style.display = 'none';
+                renderSummaryTable();
+            }
+
+            updateUI();
+        }
+
+        // Action Tally Record
+        function record(type, outcome) {
+            if (activeHalf === 'summary') return;
+
+            if (type === 'keypass' || type === 'def') {
+                stats[activeHalf][type]++;
+            } else {
+                if (outcome === 'success') {
+                    stats[activeHalf][type + '_s']++;
+                } else {
+                    stats[activeHalf][type + '_f']++;
+                }
+            }
+            saveData();
+            updateUI();
+        }
+
+        // Save Notes
+        function saveNotes() {
+            if (activeHalf === 'h1' || activeHalf === 'h2') {
+                stats[activeHalf].notes = document.getElementById('halfNotes').value;
+                saveData();
+            }
+        }
+
+        // Calculate Success Percentage Helper
+        function calcPct(succ, fail) {
+            let total = succ + fail;
+            if (total === 0) return '0%';
+            return Math.round((succ / total) * 100) + '%';
+        }
+
+        // Update UI Dashboard
+        function updateUI() {
+            // Rating Updates
+            let currentHalfData = stats[activeHalf === 'summary' ? 'h1' : activeHalf];
+            let currentRating = 6.0;
+
+            if (activeHalf === 'summary') {
+                // Combined Stats for rating
+                let combined = {
+                    dribble_s: stats.h1.dribble_s + stats.h2.dribble_s,
+                    dribble_f: stats.h1.dribble_f + stats.h2.dribble_f,
+                    cross_s: stats.h1.cross_s + stats.h2.cross_s,
+                    cross_f: stats.h1.cross_f + stats.h2.cross_f,
+                    shot_s: stats.h1.shot_s + stats.h2.shot_s,
+                    shot_f: stats.h1.shot_f + stats.h2.shot_f,
+                    keypass: stats.h1.keypass + stats.h2.keypass,
+                    def: stats.h1.def + stats.h2.def
+                };
+                currentRating = calculateRating(combined);
+                document.getElementById('ratingLabel').innerText = "FULL RATING";
+            } else {
+                currentRating = calculateRating(currentHalfData);
+                document.getElementById('ratingLabel').innerText = activeHalf === 'h1' ? "1H RATING" : "2H RATING";
+            }
+
+            const ratingElem = document.getElementById('liveRating');
+            const ratingBox = document.getElementById('ratingBox');
+            ratingElem.innerText = currentRating;
+
+            // Rating Color Dynamic Styling
+            if (currentRating >= 8.0) {
+                ratingBox.style.borderColor = "var(--accent-gold)";
+                ratingElem.style.color = "var(--accent-gold)";
+            } else if (currentRating >= 7.0) {
+                ratingBox.style.borderColor = "var(--accent-green)";
+                ratingElem.style.color = "var(--accent-green)";
+            } else if (currentRating >= 6.0) {
+                ratingBox.style.borderColor = "var(--accent-blue)";
+                ratingElem.style.color = "var(--accent-blue)";
+            } else {
+                ratingBox.style.borderColor = "var(--accent-red)";
+                ratingElem.style.color = "var(--accent-red)";
+            }
+
+            if (activeHalf === 'summary') return;
+
+            let cur = stats[activeHalf];
+
+            // Load notes for active half
+            document.getElementById('halfNotes').value = cur.notes || '';
+
+            // Dribbles
+            document.getElementById('dribble_pct').innerText = calcPct(cur.dribble_s, cur.dribble_f);
+            document.getElementById('dribble_cnt').innerText = `${cur.dribble_s} / ${cur.dribble_s + cur.dribble_f}`;
+
+            // Crosses
+            document.getElementById('cross_pct').innerText = calcPct(cur.cross_s, cur.cross_f);
+            document.getElementById('cross_cnt').innerText = `${cur.cross_s} / ${cur.cross_s + cur.cross_f}`;
+
+            // Shots
+            document.getElementById('shot_pct').innerText = calcPct(cur.shot_s, cur.shot_f);
+            document.getElementById('shot_cnt').innerText = `${cur.shot_s} / ${cur.shot_s + cur.shot_f}`;
+
+            // Counters
+            document.getElementById('keypass_cnt').innerText = cur.keypass;
+            document.getElementById('def_cnt').innerText = cur.def;
+        }
+
+        // Render Summary Table
+        function renderSummaryTable() {
+            let h1 = stats.h1;
+            let h2 = stats.h2;
+
+            let tot_dribble_s = h1.dribble_s + h2.dribble_s;
+            let tot_dribble_f = h1.dribble_f + h2.dribble_f;
+
+            let tot_cross_s = h1.cross_s + h2.cross_s;
+            let tot_cross_f = h1.cross_f + h2.cross_f;
+
+            let tot_shot_s = h1.shot_s + h2.shot_s;
+            let tot_shot_f = h1.shot_f + h2.shot_f;
+
+            let tot_keypass = h1.keypass + h2.keypass;
+            let tot_def = h1.def + h2.def;
+
+            let combinedStats = {
+                dribble_s: tot_dribble_s, dribble_f: tot_dribble_f,
+                cross_s: tot_cross_s, cross_f: tot_cross_f,
+                shot_s: tot_shot_s, shot_f: tot_shot_f,
+                keypass: tot_keypass, def: tot_def
+            };
+
+            let rating1H = calculateRating(h1);
+            let rating2H = calculateRating(h2);
+            let ratingFull = calculateRating(combinedStats);
+
+            let tbody = document.getElementById('summaryTableBody');
+            tbody.innerHTML = `
+                <tr style="background: rgba(16, 185, 129, 0.1);">
+                    <td><b>MATCH PERFORMANCE RATING</b></td>
+                    <td><b>${rating1H} / 10</b></td>
+                    <td><b>${rating2H} / 10</b></td>
+                    <td><b style="color:var(--accent-green);">${ratingFull} / 10</b></td>
+                </tr>
+                <tr>
+                    <td>1v1 Dribbles</td>
+                    <td>${h1.dribble_s}/${h1.dribble_s+h1.dribble_f} (${calcPct(h1.dribble_s, h1.dribble_f)})</td>
+                    <td>${h2.dribble_s}/${h2.dribble_s+h2.dribble_f} (${calcPct(h2.dribble_s, h2.dribble_f)})</td>
+                    <td><b>${tot_dribble_s}/${tot_dribble_s+tot_dribble_f} (${calcPct(tot_dribble_s, tot_dribble_f)})</b></td>
+                </tr>
+                <tr>
+                    <td>Crosses</td>
+                    <td>${h1.cross_s}/${h1.cross_s+h1.cross_f} (${calcPct(h1.cross_s, h1.cross_f)})</td>
+                    <td>${h2.cross_s}/${h2.cross_s+h2.cross_f} (${calcPct(h2.cross_s, h2.cross_f)})</td>
+                    <td><b>${tot_cross_s}/${tot_cross_s+tot_cross_f} (${calcPct(tot_cross_s, tot_cross_f)})</b></td>
+                </tr>
+                <tr>
+                    <td>Shots on Target</td>
+                    <td>${h1.shot_s}/${h1.shot_s+h1.shot_f} (${calcPct(h1.shot_s, h1.shot_f)})</td>
+                    <td>${h2.shot_s}/${h2.shot_s+h2.shot_f} (${calcPct(h2.shot_s, h2.shot_f)})</td>
+                    <td><b>${tot_shot_s}/${tot_shot_s+tot_shot_f} (${calcPct(tot_shot_s, tot_shot_f)})</b></td>
+                </tr>
+                <tr>
+                    <td>Key Passes</td>
+                    <td>${h1.keypass}</td>
+                    <td>${h2.keypass}</td>
+                    <td><b>${tot_keypass}</b></td>
+                </tr>
+                <tr>
+                    <td>Track Backs</td>
+                    <td>${h1.def}</td>
+                    <td>${h2.def}</td>
+                    <td><b>${tot_def}</b></td>
+                </tr>
+            `;
+        }
+
+        // Timer Functionality
+        function toggleTimer() {
+            let btn = document.getElementById('timerBtn');
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+                btn.innerText = 'Start';
+                btn.classList.remove('running');
+            } else {
+                timerInterval = setInterval(() => {
+                    seconds++;
+                    let m = Math.floor(seconds / 60).toString().padStart(2, '0');
+                    let s = (seconds % 60).toString().padStart(2, '0');
+                    document.getElementById('timer').innerText = `${m}:${s}`;
+                }, 1000);
+                btn.innerText = 'Pause';
+                btn.classList.add('running');
+            }
+        }
+
+        // Persistence
+        function saveData() {
+            let matchData = {
+                player: document.getElementById('playerName').value,
+                opponent: document.getElementById('opponent').value,
+                date: document.getElementById('matchDate').value,
+                stats: stats
+            };
+            localStorage.setItem('lw_match_tracker_data', JSON.stringify(matchData));
+        }
+
+        function loadStoredData() {
+            let saved = localStorage.getItem('lw_match_tracker_data');
+            if (saved) {
+                try {
+                    let parsed = JSON.parse(saved);
+                    document.getElementById('playerName').value = parsed.player || '';
+                    document.getElementById('opponent').value = parsed.opponent || '';
+                    document.getElementById('matchDate').value = parsed.date || new Date().toISOString().split('T')[0];
+                    if (parsed.stats) stats = parsed.stats;
+                } catch(e) {}
+            }
+        }
+
+        function resetAllData() {
+            if (confirm("Are you sure you want to reset all stats for this match?")) {
+                stats = {
+                    h1: { dribble_s: 0, dribble_f: 0, cross_s: 0, cross_f: 0, shot_s: 0, shot_f: 0, keypass: 0, def: 0, notes: '' },
+                    h2: { dribble_s: 0, dribble_f: 0, cross_s: 0, cross_f: 0, shot_s: 0, shot_f: 0, keypass: 0, def: 0, notes: '' }
+                };
+                localStorage.removeItem('lw_match_tracker_data');
+                seconds = 0;
+                document.getElementById('timer').innerText = "00:00";
+                if (timerInterval) toggleTimer();
+                updateUI();
+                if (activeHalf === 'summary') renderSummaryTable();
+            }
+        }
+
+        // CSV Export with dynamic Rating Inclusion
+        function exportCSV() {
+            let player = document.getElementById('playerName').value || 'Player';
+            let opp = document.getElementById('opponent').value || 'Opponent';
+            let date = document.getElementById('matchDate').value || 'Date';
+
+            let h1 = stats.h1;
+            let h2 = stats.h2;
+
+            let combined = {
+                dribble_s: h1.dribble_s + h2.dribble_s, dribble_f: h1.dribble_f + h2.dribble_f,
+                cross_s: h1.cross_s + h2.cross_s, cross_f: h1.cross_f + h2.cross_f,
+                shot_s: h1.shot_s + h2.shot_s, shot_f: h1.shot_f + h2.shot_f,
+                keypass: h1.keypass + h2.keypass, def: h1.def + h2.def
+            };
+
+            let rating1H = calculateRating(h1);
+            let rating2H = calculateRating(h2);
+            let ratingFull = calculateRating(combined);
+
+            let csvRows = [
+                ["LW MATCH PERFORMANCE REPORT"],
+                ["Player", player],
+                ["Opponent", opp],
+                ["Date", date],
+                [],
+                ["PERFORMANCE RATING (Scale 3.0 - 10.0)"],
+                ["1st Half Rating", `${rating1H} / 10`],
+                ["2nd Half Rating", `${rating2H} / 10`],
+                ["Full Match Rating", `${ratingFull} / 10`],
+                [],
+                ["Metric", "1st Half (Succ/Total)", "1st Half Success %", "2nd Half (Succ/Total)", "2nd Half Success %", "Full Match Total", "Overall Success %"],
+                [
+                    "1v1 Dribbles",
+                    `${h1.dribble_s}/${h1.dribble_s+h1.dribble_f}`,
+                    calcPct(h1.dribble_s, h1.dribble_f),
+                    `${h2.dribble_s}/${h2.dribble_s+h2.dribble_f}`,
+                    calcPct(h2.dribble_s, h2.dribble_f),
+                    `${combined.dribble_s}/${combined.dribble_s+combined.dribble_f}`,
+                    calcPct(combined.dribble_s, combined.dribble_f)
+                ],
+                [
+                    "Crosses & Cutbacks",
+                    `${h1.cross_s}/${h1.cross_s+h1.cross_f}`,
+                    calcPct(h1.cross_s, h1.cross_f),
+                    `${h2.cross_s}/${h2.cross_s+h2.cross_f}`,
+                    calcPct(h2.cross_s, h2.cross_f),
+                    `${combined.cross_s}/${combined.cross_s+combined.cross_f}`,
+                    calcPct(combined.cross_s, combined.cross_f)
+                ],
+                [
+                    "Shots on Target",
+                    `${h1.shot_s}/${h1.shot_s+h1.shot_f}`,
+                    calcPct(h1.shot_s, h1.shot_f),
+                    `${h2.shot_s}/${h2.shot_s+h2.shot_f}`,
+                    calcPct(h2.shot_s, h2.shot_f),
+                    `${combined.shot_s}/${combined.shot_s+combined.shot_f}`,
+                    calcPct(combined.shot_s, combined.shot_f)
+                ],
+                [
+                    "Key Passes Created",
+                    h1.keypass,
+                    "N/A",
+                    h2.keypass,
+                    "N/A",
+                    combined.keypass,
+                    "N/A"
+                ],
+                [
+                    "Defensive Recoveries",
+                    h1.def,
+                    "N/A",
+                    h2.def,
+                    "N/A",
+                    combined.def,
+                    "N/A"
+                ],
+                [],
+                ["NOTES"],
+                ["1st Half Notes", `"${(h1.notes || 'None').replace(/"/g, '""')}"`],
+                ["2nd Half Notes", `"${(h2.notes || 'None').replace(/"/g, '""')}"`]
             ];
-            
-            // Format each row with quotes to prevent OpenOffice from messing up columns
-            var formattedRow = rowData.map(function(item) {
-                return '"' + String(item).replace(/"/g, '""') + '"';
-            });
-            
-            csvRows.push(formattedRow.join(","));
+
+            let csvContent = "data:text/csv;charset=utf-8," + csvRows.map(e => e.join(",")).join("\n");
+            let encodedUri = encodeURI(csvContent);
+            let link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `${player}_vs_${opp}_Match_Report.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
-
-        var csvString = csvRows.join("\r\n");
-        // Create Blob to fix formatting and character limits
-        var blob = new Blob(["\uFEFF" + csvString], { type: 'text/csv;charset=utf-8;' });
-        var url = URL.createObjectURL(blob);
-        
-        var link = document.createElement("a");
-        link.setAttribute("href", url);
-        link.setAttribute("download", "Team_Match_Stats.csv");
-        document.body.appendChild(link); 
-        link.click();
-        document.body.removeChild(link);
-    }
-
-    // Attach to global window object
-    window.openModal = openModal;
-    window.closeModal = closeModal;
-    window.addPlayer = addPlayer;
-    window.updateStat = updateStat;
-    window.updateStatCalc = updateStatCalc;
-    window.exportCSV = exportCSV;
-    window.clearAllData = clearAllData;
-</script>
-
+    </script>
 </body>
 </html>

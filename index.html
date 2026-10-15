@@ -58,6 +58,8 @@
             gap: 10px;
         }
 
+        select.badge { border: none; cursor: pointer; font-family: inherit; }
+
         .badge {
             background-color: var(--accent-green);
             color: #000;
@@ -393,7 +395,7 @@
     <div class="header">
         <div class="top-bar">
             <div class="title-area">
-                <div class="badge">LW</div>
+                <select class="badge" id="positionSelect"><option value="LB">LB</option><option value="CB">CB</option><option value="RB">RB</option><option value="LM">LM</option><option value="CM">CM</option><option value="RM">RM</option><option value="LW" selected>LW</option><option value="RW">RW</option><option value="ST">ST</option></select>
                 <div class="title-text">
                     <h1>Match Tracker</h1>
                     <span>Player Performance</span>
@@ -921,7 +923,7 @@
             let ratingFull = calculateRating(combined);
 
             let csvRows = [
-                ["LW MATCH PERFORMANCE REPORT"],
+                [`${document.getElementById("positionSelect").value} MATCH PERFORMANCE REPORT`],
                 ["Player", player],
                 ["Opponent", opp],
                 ["Date", date],

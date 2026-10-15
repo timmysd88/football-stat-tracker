@@ -395,7 +395,7 @@
     <div class="header">
         <div class="top-bar">
             <div class="title-area">
-                <select class="badge" id="positionSelect"><option value="LB">LB</option><option value="CB">CB</option><option value="RB">RB</option><option value="LM">LM</option><option value="CM">CM</option><option value="RM">RM</option><option value="LW" selected>LW</option><option value="RW">RW</option><option value="ST">ST</option></select>
+                <select class="badge" id="positionSelect" onchange="saveData()"><option value="LB">LB</option><option value="CB">CB</option><option value="RB">RB</option><option value="LM">LM</option><option value="CM">CM</option><option value="RM">RM</option><option value="LW" selected>LW</option><option value="RW">RW</option><option value="ST">ST</option></select>
                 <div class="title-text">
                     <h1>Match Tracker</h1>
                     <span>Player Performance</span>
@@ -869,6 +869,7 @@
                 player: document.getElementById('playerName').value,
                 opponent: document.getElementById('opponent').value,
                 date: document.getElementById('matchDate').value,
+                position: document.getElementById('positionSelect').value,
                 stats: stats
             };
             localStorage.setItem('lw_match_tracker_data', JSON.stringify(matchData));
@@ -882,7 +883,11 @@
                     document.getElementById('playerName').value = parsed.player || '';
                     document.getElementById('opponent').value = parsed.opponent || '';
                     document.getElementById('matchDate').value = parsed.date || new Date().toISOString().split('T')[0];
-                    if (parsed.stats) stats = parsed.stats;
+                    if (parsed.position) document.getElementById('positionSelect').value = parsed.position;
+                    if (parsed.stats) {
+                        stats.h1 = Object.assign({}, stats.h1, parsed.stats.h1);
+                        stats.h2 = Object.assign({}, stats.h2, parsed.stats.h2);
+                    }
                 } catch(e) {}
             }
         }
@@ -985,11 +990,16 @@
                 ["2nd Half Notes", `"${(h2.notes || 'None').replace(/"/g, '""')}"`]
             ];
 
-            let csvContent = "data:text/csv;charset=utf-8," + csvRows.map(e => e.join(",")).join("\n");
-            let encodedUri = encodeURI(csvContent);
+            const esc = v => {
+                v = String(v);
+                if (v.length > 1 && v.startsWith('"') && v.endsWith('"')) return v;
+                return /[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v;
+            };
+            let csvContent = csvRows.map(e => e.map(esc).join(",")).join("\n");
+            let encodedUri = "data:text/csv;charset=utf-8," + encodeURIComponent(csvContent);
             let link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `${player}_vs_${opp}_Match_Report.csv`);
+            link.setAttribute("download", `${player}_vs_${opp}_Match_Report.csv`.replace(/[\\/:*?"<>|]/g, '_'));
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);

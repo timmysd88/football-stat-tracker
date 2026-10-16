@@ -395,7 +395,7 @@
     <div class="header">
         <div class="top-bar">
             <div class="title-area">
-                <select class="badge" id="positionSelect" onchange="saveData()"><option value="LB">LB</option><option value="CB">CB</option><option value="RB">RB</option><option value="LM">LM</option><option value="CM">CM</option><option value="RM">RM</option><option value="LW" selected>LW</option><option value="RW">RW</option><option value="ST">ST</option></select>
+                <select class="badge" id="positionSelect" onchange="saveData()"><option value="" selected>Pos</option><option value="LB">LB</option><option value="CB">CB</option><option value="RB">RB</option><option value="LM">LM</option><option value="CM">CM</option><option value="RM">RM</option><option value="LW">LW</option><option value="CAM">CAM</option><option value="RW">RW</option><option value="ST">ST</option></select>
                 <div class="title-text">
                     <h1>Match Tracker</h1>
                     <span>Player Performance</span>
@@ -883,7 +883,7 @@
                     document.getElementById('playerName').value = parsed.player || '';
                     document.getElementById('opponent').value = parsed.opponent || '';
                     document.getElementById('matchDate').value = parsed.date || new Date().toISOString().split('T')[0];
-                    if (parsed.position) document.getElementById('positionSelect').value = parsed.position;
+                    if (parsed.position != null) document.getElementById('positionSelect').value = parsed.position;
                     if (parsed.stats) {
                         stats.h1 = Object.assign({}, stats.h1, parsed.stats.h1);
                         stats.h2 = Object.assign({}, stats.h2, parsed.stats.h2);
@@ -928,7 +928,7 @@
             let ratingFull = calculateRating(combined);
 
             let csvRows = [
-                [`${document.getElementById("positionSelect").value} MATCH PERFORMANCE REPORT`],
+                [`${document.getElementById("positionSelect").value || "PLAYER"} MATCH PERFORMANCE REPORT`],
                 ["Player", player],
                 ["Opponent", opp],
                 ["Date", date],
